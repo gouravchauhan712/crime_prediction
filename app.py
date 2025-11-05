@@ -5,15 +5,6 @@ import numpy as np
 import joblib
 
 # ==============================
-# 🔹 Function to check file existence
-# ==============================
-def check_file(filename):
-    if not os.path.exists(filename):
-        st.error(f"❌ File not found: {filename}. Make sure it is in the same folder as app.py")
-        st.stop()
-    return filename
-
-# ==============================
 # 🔹 Load Model & Data Safely
 # ==============================
 reg_model_path = check_file("crime_rate_best_model.pkl")
@@ -169,3 +160,4 @@ if st.button("🔍 Predict Crime Rate", use_container_width=True):
     c3.markdown(f"<div class='metric-box'><h3 style='color:{color};'>{level}</h3><p>Area Safety Level</p></div>", unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
+
