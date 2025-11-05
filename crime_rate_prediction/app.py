@@ -4,15 +4,8 @@ import pandas as pd
 import numpy as np
 import joblib
 
-# ==============================
-# 🔹 Function to check file existence
-# ==============================
-def check_file(filename):
-    """Check if a file exists in the current folder, stop app if missing."""
-    if not os.path.exists(filename):
-        st.error(f"❌ File not found: {filename}. Make sure it is in the same folder as App.py.")
-        st.stop()
-    return filename
+st.write("Current folder:", os.getcwd())
+st.write("Files in folder:", os.listdir())
 
 # ==============================
 # 🔹 Load Model & Data Safely
@@ -158,3 +151,4 @@ if st.button("🔍 Predict Crime Rate", use_container_width=True):
     c3.markdown(f"<div class='metric-box'><h3 style='color:{color};'>{level}</h3><p>Area Safety Level</p></div>", unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
+
