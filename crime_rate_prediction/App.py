@@ -1,19 +1,34 @@
+import os
 import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
-import os
-
-st.write("Working directory:", os.getcwd())
-st.write("Files in current folder:", os.listdir())
-
 
 # ==============================
-# 🔹 Load Model & Data
+# 🔹 Function to check file existence
 # ==============================
-reg_model = joblib.load("crime_rate_best_model.pkl")
-city_mean_rate = joblib.load("city_mean_rate.pkl")
-pop_df = pd.read_csv("population.csv")
+def check_file(filename):
+    """Check if a file exists in the current folder, stop app if missing."""
+    if not os.path.exists(filename):
+        st.error(f"❌ File not found: {filename}. Make sure it is in the same folder as App.py.")
+        st.stop()
+    return filename
+
+# ==============================
+# 🔹 Load Model & Data Safely
+# ==============================
+reg_model_path = check_file("crime_rate_best_model.pkl")
+city_mean_path = check_file("city_mean_rate.pkl")
+pop_path = check_file("population.csv")
+
+reg_model = joblib.load(reg_model_path)
+city_mean_rate = joblib.load(city_mean_path)
+pop_df = pd.read_csv(pop_path)
+
+# ==============================
+# 🔹 Debug: List files in folder
+# ==============================
+st.write("📂 Current folder files:", os.listdir())
 
 # ==============================
 # 🎨 Page Config
@@ -22,51 +37,51 @@ st.set_page_config(page_title="Crime Rate Predictor", page_icon="🚨", layout="
 
 # --- Custom Light CSS ---
 st.markdown("""
-    <style>
-        [data-testid="stAppViewContainer"] {
-            background: linear-gradient(135deg, #e9f2fb, #f7fbff);
-            color: #1b1b1b;
-        }
-        .main-card {
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 16px;
-            padding: 25px;
-            margin-top: 20px;
-            color: #1b1b1b;
-            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-        }
-        .title {
-            text-align: center;
-            color: #003366;
-            font-size: 36px;
-            font-weight: 700;
-        }
-        .sub {
-            text-align: center;
-            color: #4a6fa5;
-            font-size: 18px;
-            margin-bottom: 25px;
-        }
-        .metric-box {
-            background-color: #f0f7ff;
-            padding: 18px;
-            border-radius: 12px;
-            text-align: center;
-            color: #003366;
-            border: 1px solid #d1e3f8;
-        }
-        .stButton>button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 18px;
-            font-weight: 600;
-        }
-        .stButton>button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+<style>
+[data-testid="stAppViewContainer"] {
+    background: linear-gradient(135deg, #e9f2fb, #f7fbff);
+    color: #1b1b1b;
+}
+.main-card {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    padding: 25px;
+    margin-top: 20px;
+    color: #1b1b1b;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+}
+.title {
+    text-align: center;
+    color: #003366;
+    font-size: 36px;
+    font-weight: 700;
+}
+.sub {
+    text-align: center;
+    color: #4a6fa5;
+    font-size: 18px;
+    margin-bottom: 25px;
+}
+.metric-box {
+    background-color: #f0f7ff;
+    padding: 18px;
+    border-radius: 12px;
+    text-align: center;
+    color: #003366;
+    border: 1px solid #d1e3f8;
+}
+.stButton>button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-weight: 600;
+}
+.stButton>button:hover {
+    background-color: #0056b3;
+}
+</style>
 """, unsafe_allow_html=True)
 
 # ==============================
@@ -87,7 +102,8 @@ with st.container():
         year = st.selectbox("📅 Select Year", list(range(2000, 2036)))
     with col2:
         crime_domain = st.selectbox("⚖️ Select Crime Domain", [
-            "Theft", "Assault", "Murder", "Fraud", "Cybercrime", "Kidnapping", "Domestic Violence", "Robbery", "Burglary"
+            "Theft", "Assault", "Murder", "Fraud", "Cybercrime", "Kidnapping", 
+            "Domestic Violence", "Robbery", "Burglary"
         ])
         month = st.selectbox("🗓️ Select Month", list(range(1, 13)))
 
@@ -108,7 +124,11 @@ if st.button("🔍 Predict Crime Rate", use_container_width=True):
     }])
 
     # Predict
-    pred_rate = reg_model.predict(input_df)[0]
+    try:
+        pred_rate = reg_model.predict(input_df)[0]
+    except Exception as e:
+        st.error(f"❌ Prediction failed: {e}")
+        st.stop()
 
     # Population lookup
     pop = pop_df.loc[pop_df["City"] == city, "Population"]
@@ -138,6 +158,3 @@ if st.button("🔍 Predict Crime Rate", use_container_width=True):
     c3.markdown(f"<div class='metric-box'><h3 style='color:{color};'>{level}</h3><p>Area Safety Level</p></div>", unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
-
-
-
