@@ -2,6 +2,11 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
+import os
+
+st.write("Working directory:", os.getcwd())
+st.write("Files in current folder:", os.listdir())
+
 
 # ==============================
 # 🔹 Load Model & Data
@@ -133,5 +138,6 @@ if st.button("🔍 Predict Crime Rate", use_container_width=True):
     c3.markdown(f"<div class='metric-box'><h3 style='color:{color};'>{level}</h3><p>Area Safety Level</p></div>", unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
+
 
 
