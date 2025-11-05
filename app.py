@@ -1,4 +1,3 @@
-import os
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -7,7 +6,7 @@ import joblib
 # ==============================
 # 🔹 Load Model & Data
 # ==============================
-reg_model = joblib.load("crime_rate_best_model.pkl")
+reg_model = joblib.load("crime_rate_best_model.pkl")  # trained pipeline
 city_mean_rate = joblib.load("city_mean_rate.pkl")
 pop_df = pd.read_csv("population.csv")
 
@@ -94,30 +93,24 @@ with st.container():
 # 🔮 Prediction
 # ==============================
 if st.button("🔍 Predict Crime Rate", use_container_width=True):
-    # Get city mean rate
+    # Get city mean rate for additional feature
     mean_rate = city_mean_rate.get(city, np.mean(list(city_mean_rate.values())))
 
-    # Base input dataframe
+    # Create input dataframe with exact columns used during training
     input_df = pd.DataFrame([{
         "City": city,
+        "Crime Domain": crime_domain,
         "Month": month,
         "Year": year,
         "City_MeanRate": mean_rate
     }])
 
-    # One-hot encode Crime Domain
-    crime_domains = [
-        "Theft", "Assault", "Murder", "Fraud", "Cybercrime", 
-        "Kidnapping", "Domestic Violence", "Robbery", "Burglary"
-    ]
-    for domain in crime_domains:
-        input_df[f"Crime Domain_{domain}"] = 1 if domain == crime_domain else 0
-
-    # Ensure correct feature order
-    input_df = input_df.reindex(columns=reg_model.feature_names_in_, fill_value=0)
-
-    # Predict crime rate
-    pred_rate = reg_model.predict(input_df)[0]
+    # Predict using trained pipeline (handles encoding internally)
+    try:
+        pred_rate = reg_model.predict(input_df)[0]
+    except Exception as e:
+        st.error(f"❌ Prediction failed: {e}")
+        st.stop()
 
     # Population lookup
     pop = pop_df.loc[pop_df["City"] == city, "Population"]
@@ -145,5 +138,4 @@ if st.button("🔍 Predict Crime Rate", use_container_width=True):
     c1.markdown(f"<div class='metric-box'><h3>{pred_rate:.2f}</h3><p>Crime Rate<br>(per 100,000)</p></div>", unsafe_allow_html=True)
     c2.markdown(f"<div class='metric-box'><h3>{int(est_cases):,}</h3><p>Estimated Cases</p></div>", unsafe_allow_html=True)
     c3.markdown(f"<div class='metric-box'><h3 style='color:{color};'>{level}</h3><p>Area Safety Level</p></div>", unsafe_allow_html=True)
-
     st.markdown("</div>", unsafe_allow_html=True)
