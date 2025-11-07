@@ -11,7 +11,7 @@ city_mean_rate = joblib.load("city_mean_rate.pkl")
 pop_df = pd.read_csv("population.csv")
 
 # ==============================
-# 🎨 Page Config
+#  Page Config
 # ==============================
 st.set_page_config(page_title="Crime Rate Predictor", page_icon="🚨", layout="centered")
 
@@ -90,7 +90,7 @@ with st.container():
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ==============================
-# 🔮 Prediction
+#  Prediction
 # ==============================
 if st.button("🔍 Predict Crime Rate", use_container_width=True):
     # Get city mean rate for additional feature
@@ -118,18 +118,19 @@ if st.button("🔍 Predict Crime Rate", use_container_width=True):
     est_cases = (pred_rate * population) / 100000
 
     # Determine crime level
-    if pred_rate > 15:
+    if est_cases > 150:
         level = "🔴 High Crime Area"
         color = "red"
-    elif pred_rate > 7:
+    elif est_cases > 75:
         level = "🟠 Moderate Crime Area"
         color = "orange"
     else:
         level = "🟢 Low Crime Area"
         color = "green"
 
+
     # ==============================
-    # 📊 Display Results
+    #  Display Results
     # ==============================
     st.markdown("<div class='main-card'>", unsafe_allow_html=True)
     st.subheader("📈 Prediction Results")
@@ -139,3 +140,4 @@ if st.button("🔍 Predict Crime Rate", use_container_width=True):
     c2.markdown(f"<div class='metric-box'><h3>{int(est_cases):,}</h3><p>Estimated Cases</p></div>", unsafe_allow_html=True)
     c3.markdown(f"<div class='metric-box'><h3 style='color:{color};'>{level}</h3><p>Area Safety Level</p></div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
+
