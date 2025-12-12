@@ -79,7 +79,7 @@ with st.container():
 
     with col1:
         city = st.selectbox("🏙️ Select City", sorted(pop_df['City'].unique()))
-        year = st.selectbox("📅 Select Year", list(range(2000, 2036)))
+        year = st.selectbox("📅 Select Year", [2026]) 
     with col2:
         crime_domain = st.selectbox("⚖️ Select Crime Domain", [
             "Theft", "Assault", "Murder", "Fraud", "Cybercrime", 
@@ -140,4 +140,5 @@ if st.button("🔍 Predict Crime Rate", use_container_width=True):
     c2.markdown(f"<div class='metric-box'><h3>{int(est_cases):,}</h3><p>Estimated Cases</p></div>", unsafe_allow_html=True)
     c3.markdown(f"<div class='metric-box'><h3 style='color:{color};'>{level}</h3><p>Area Safety Level</p></div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
+
 
